@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Awesome Vue.js 3.0 Test</title>
+    <script src="./vue3.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h3>
+        Next Generation Click Counters<br />
+        <button v-on:click="incrementCounter">Increase count</button>
+        <button v-on:click="resetCounter">Reset</button>
+        <pre>
+reactive() object example:   
+    count: {{ state.count }}
+
+ref() value examples:
+    2^<sup>count</sup>: {{ twoExpCount }}
+</pre>
+      </h3>
+      <a href="https://vue-composition-api-rfc.netlify.com/#ref-vs-reactive" target="_blank">See ref vs reactive</a>
+
+      <p>
+        * Pro tip: open your Chrome Console to see the watchers in action.
+      </p>
+      <br />
+      <h3>
+        Cutting Edge Cursor Trackor:
+        <pre>
+Mouse location: 
+    x:{{ x }}px y:{{ y }}px 
+</pre
+        >
+      </h3>
+
+      <p><a href="https://vue-composition-api-rfc.netlify.com/" target="_blank">See Composition API RFC</a></p>
+    </div>
+
+    <script>
+      const { ref, reactive, onMounted, onUnmounted, watch } = Vue;
+      const app = Vue.createApp();
+      const featureFoo = () => {
+        onMounted(() => {
+          console.log("mounted: featureFoo");
+        });
+
+        return {};
+      };
+
+      const useMousePosition = () => {
+        const x = ref(0);
+        const y = ref(0);
+
+        function update(e) {
+          x.value = e.pageX;
+          y.value = e.pageY;
+        }
+
+        onMounted(() => {
+          console.log("mounted: useMousePosition");
+          window.addEventListener("mousemove", update);
+        });
+
+        onUnmounted(() => {
+          window.removeEventListener("mousemove", update);
+        });
+
+        return { x, y };
+      };
+
+      const App = {
+        setup() {
+          const state = reactive({ count: 0 });
+          const twoExpCount = ref(0);
+
+          watch(() => {
+            console.log("Watcher: twoExpCount", twoExpCount, twoExpCount.value);
+          });
+
+          watch(() => console.log("Watcher: state.count", state, state.count));
+
+          onMounted(() => {
+            console.log("mounted: main component");
+          });
+
+          onUnmounted(() => {
+            console.log("onUnmounted: main component");
+          });
+
+          const a = featureFoo();
+
+          const { x, y } = useMousePosition();
+
+          const incrementCounter = () => {
+            state.count++;
+            twoExpCount.value = 2 ** state.count;
+          };
+
+          const resetCounter = () => {
+            state.count = 0;
+            twoExpCount.value = 0;
+          };
+
+          return {
+            state,
+            incrementCounter,
+            resetCounter,
+            x,
+            y,
+            twoExpCount,
+          };
+        },
+      };
+
+      app.mount(App, "#app");
+    </script>
+  </body>
+</html>
